@@ -123,7 +123,7 @@ def getContainerRegistryCredentialFile(def branchName) {
   }
 	
   def movePerfino(def targetDirName) {
-    sh """
+    steps.sh """
       mv ./com/perfino/agent/zip/agent.zip ./
       unzip ./agent.zip
 
@@ -133,7 +133,7 @@ def getContainerRegistryCredentialFile(def branchName) {
   }
 	
   def moveApm(def targetDirName) {
-    sh """
+    steps.sh """
       mv ./com/microsoft/azure/applicationinsights-agent/3.2.11 ./applicationinsights-agent-3.2.11.jar
       cp ./applicationinsights-agent-3.2.11.jar ./$targetDirName/src/main/perfino
       cp ./applicationinsights.json ./$targetDirName/src/main/perfino
@@ -141,7 +141,7 @@ def getContainerRegistryCredentialFile(def branchName) {
   }
 	
   def loginToCloud(def clientId, def clientSecret, def tenantId, def subscriptionId, def containerRegistryName) {
-    sh """
+    steps.sh """
       az login --service-principal -u clientId -p clientSecret -t tenantId
       az account set -s subscriptionId
       az configure --defaults acr=containerRegistryName
