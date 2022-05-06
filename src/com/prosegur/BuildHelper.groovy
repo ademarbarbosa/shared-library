@@ -88,13 +88,13 @@ def getContainerRegistryCredentialFile(def branchName) {
 	
   def connectToArtifactory(def serverId, def artifactoryUrl, def username, def password) {
     rtServer(
-      id: serverId,
-      url: artifactoryUrl,
-      username: username,
-      password: password,
-      bypassProxy: true,
-      timeout: 300
-    )
+                  id: 'Artifactory-1',
+                  url: "https://procde.prosegur.com/artifactory",
+                  username: "${username}",
+                  password: "${password}",
+                  bypassProxy: true,
+                  timeout: 300
+                )
   }
 	
   def downloadJarFromArtifactory(def serverId, def jarUrl, def targetDir) {
