@@ -111,10 +111,10 @@ def getContainerRegistryCredentialFile(def branchName) {
     )
   }
 	
-  def getMavenArgs(def profileName, def skipTests) {
+  def getMavenArgs(def profileName, def skipTests, def mavenUserSettings, def mavenGlobalSettings) {
     def SET_MAVEN_LOCALREPO = "-Dmaven.repo.local=/root/.m2/repository"
     def HIDE_DOWNLOADS = "-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn"
-    def MAVEN_SETTINGS = "-s $MAVEN_USER_SETTINGS -gs $MAVEN_GLOBAL_SETTINGS"
+    def MAVEN_SETTINGS = "-s mavenUserSettings -gs mavenGlobalSettings"
     def MAVEN_PROFILE = "-P$profileName"
     def MAVEN_GOAL = 'install deploy:deploy '
     def MAVEN_SKIP_TESTS = '-Dmaven.test.skip=$skipTests'
