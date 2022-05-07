@@ -1,5 +1,7 @@
 package com.prosegur
 
+import groovy.json.JsonOutput
+
 class BuildHelper {
   def steps
 	
@@ -88,37 +90,31 @@ def getContainerRegistryCredentialFile(def branchName) {
 	
   def connectToArtifactory(def serverId, def artifactoryUrl, def username, def password) {
     steps.rtServer(
-      id: serverId,
-      url: artifactoryUrl,
-      username: username,
-      password: password,
-      bypassProxy: true,
-      timeout: 300
-    )
+                  id: serverId,
+                  url: artifactoryUrl,
+                  username: username,
+                  password: password,
+                  bypassProxy: true,
+                  timeout: 300
+                )
   }
 	
   def downloadJarFromArtifactory(def serverId, def jarUrl, def targetDir) {
+    def json = """{ "files": [ { "pattern": "${jarUrl}", "target": "${targetDir}" } ] }"""
     steps.rtDownload(
       serverId: serverId,
-      spec: """{
-      "files": [
-	  {
-	  "pattern": jarUrl,
-	  "target": targetDir
-	  }
-      ]
-      }"""
+      spec: json
     )
   }
 	
   def getMavenArgs(def profileName, def skipTests, def mavenUserSettings, def mavenGlobalSettings) {
     def SET_MAVEN_LOCALREPO = "-Dmaven.repo.local=/root/.m2/repository"
     def HIDE_DOWNLOADS = "-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn"
-    def MAVEN_SETTINGS = "-s mavenUserSettings -gs mavenGlobalSettings"
-    def MAVEN_PROFILE = "-P$profileName"
+    def MAVEN_SETTINGS = """-s ${mavenUserSettings} -gs ${mavenGlobalSettings}"""
+    def MAVEN_PROFILE = """-P${profileName}"""
     def MAVEN_GOAL = 'install deploy:deploy '
-    def MAVEN_SKIP_TESTS = '-Dmaven.test.skip=$skipTests'
-    def MAVEN_ARGUMENTS = "$SET_MAVEN_LOCALREPO $MAVEN_PROFILE $MAVEN_GOAL $MAVEN_SKIP_TESTS $MAVEN_SETTINGS -B $HIDE_DOWNLOADS "
+    def MAVEN_SKIP_TESTS = """-Dmaven.test.skip=${skipTests}"""
+    def MAVEN_ARGUMENTS = """${SET_MAVEN_LOCALREPO} ${MAVEN_PROFILE} ${MAVEN_GOAL} ${MAVEN_SKIP_TESTS} ${MAVEN_SETTINGS} -B ${HIDE_DOWNLOADS} """
     return MAVEN_ARGUMENTS;
   }
 	
@@ -140,12 +136,12 @@ def getContainerRegistryCredentialFile(def branchName) {
      """
   }
 	
-  def loginToCloud(def clientId, def clientSecret, def tenantId, def subscriptionId, def containerRegistryName) {
+  def loginToCloud(def clientId, def clientSecret, def tenantId, def subscriptionId, def containerRegistryName, def credential_azure) {
     steps.sh """
-      az login --service-principal -u clientId -p clientSecret -t tenantId
-      az account set -s subscriptionId
-      az configure --defaults acr=containerRegistryName
-      cat $credential_azure > ./config.json
+      az login --service-principal -u ${clientId} -p ${clientSecret} -t ${tenantId}
+      az account set -s ${subscriptionId}
+      az configure --defaults acr=${containerRegistryName}
+      cat ${credential_azure} > ./config.json
       export DOCKER_CONFIG=\$(pwd)
     """
   }
