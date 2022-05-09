@@ -1,5 +1,5 @@
 def getCloudCI() {
-    echo "CASH-CI"
+  return "CASH-CI"
 }
 
 def getContainer(def imageName, def imageUrl, def cpu, def memory) {
