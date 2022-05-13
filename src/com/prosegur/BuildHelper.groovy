@@ -141,8 +141,15 @@ def getContainerRegistryCredentialFile(def branchName) {
       az login --service-principal -u ${clientId} -p ${clientSecret} -t ${tenantId}
       az account set -s ${subscriptionId}
       az configure --defaults acr=${containerRegistryName}
+
       cat ${credential_azure} > ./config.json
+    """
+  }
+  
+  def buildProject(def apmEnv, def helmEnv, def mavenArguments, def perfinoFlags, def apmFlags, def projectName) {
+    steps.sh """
       export DOCKER_CONFIG=\$(pwd)
+      mvn -Djib.console=plain -Denv=${apmEnv} -DhelmEnv=${helmEnv} ${mavenArguments} com.google.cloud.tools:jib-maven-plugin:build -Dperfino.jvm.flags=${perfinoFlags} -Dapp.insights.jvm.flags=${apmFlags} -f ${projectName}/pom.xml
     """
   }
 	
