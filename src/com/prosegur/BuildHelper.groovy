@@ -5,17 +5,35 @@ import groovy.json.JsonOutput
 class BuildHelper {
   def steps
 	
-	BuildHelper(steps) {
-		this.steps = steps
-	} 
+  BuildHelper(steps) {
+    this.steps = steps
+  } 
+  
+  def isDevelopmentMode(branchName) {
+      if (branchName.startsWith('development')) {
+          return true;
+      }
+  }
+  
+  def isHomologationMode(branchName) {
+      if (branchName.startsWith('release')) {
+          return true;
+      }
+  }
+  
+  def isProductionMode(branchName) {
+      if (branchName.startsWith('master')) {
+          return true;
+      }
+  }
   
   def getMavenProfile(def branchName) {
-		def mavenProfile_name = "azure-nilo-uat-qa"
-    if (branchName.startsWith('development') || branchName.startsWith('development-v')) {
+	def mavenProfile_name = "azure-nilo-uat-qa"
+    if (isDevelopmentMode(branchName)) {
         mavenProfile_name = "azure-nilo-uat-qa"
-    } else if (branchName.startsWith('release') || branchName.startsWith('release-v')) {
+    } else if (isHomologationMode(branchName)) {
         mavenProfile_name = "azure-nilo-uat-qa"
-    } else if (branchName.startsWith('master') || branchName.name.startsWith('master-v')) {
+    } else if (isProductionMode(branchName)) {
         mavenProfile_name = "azure-nilo-pro"
     }
     return mavenProfile_name;
@@ -23,54 +41,54 @@ class BuildHelper {
 	
   def getHelmEnv(def branchName) {
     def helmEnv = "dev"
-    if (branchName.startsWith('development') || branchName.startsWith('development-v')) {
-	helmEnv = "dev"
-    } else if (branchName.startsWith('release') || branchName.startsWith('release-v')) {
-	helmEnv = "uat"
-    } else if (branchName.startsWith('master') || branchName.startsWith('master-v')) {
-	helmEnv = "pro"
+    if (isDevelopmentMode(branchName)) {
+	  helmEnv = "dev"
+    } else if (isHomologationMode(branchName)) {
+	  helmEnv = "uat"
+    } else if (isProductionMode(branchName)) {
+	  helmEnv = "pro"
     }
     return helmEnv
   }
 	
   def getCloudServicePrincipal(def branchName) {
     def azureServicePrincipal_name = "azure-nilo-non-prod"
-    if (branchName.startsWith('development') || branchName.startsWith('development-v')) {
-	azureServicePrincipal_name = "azure-nilo-non-prod"
-    } else if (branchName.startsWith('release') || branchName.startsWith('release-v')) {
-	azureServicePrincipal_name = "azure-nilo-non-prod"
-    } else if (branchName.startsWith('master') || branchName.startsWith('master-v')) {
-	azureServicePrincipal_name = "azure-nilo-prod"
+    if (isDevelopmentMode(branchName)) {
+	  azureServicePrincipal_name = "azure-nilo-non-prod"
+    } else if (isHomologationMode(branchName)) {
+	  azureServicePrincipal_name = "azure-nilo-non-prod"
+    } else if (isProductionMode(branchName)) {
+	  azureServicePrincipal_name = "azure-nilo-prod"
     }
     return azureServicePrincipal_name
   }
 	
   def getContainerRegistryName(def branchName) {
     def acrNiloRepository_name = "emaznilopcregistry01" 
-    if (branchName.startsWith('development') || branchName.startsWith('release') || branchName.startsWith('development-v') || branchName.startsWith('release-v')) {
+    if (isDevelopmentMode(branchName) || isHomologationMode(branchName)) {
       acrNiloRepository_name = "nilocontainerregistry" 
-    } else if (branchName.startsWith('master') || branchName.startsWith('master-v')) {
+    } else if (isProductionMode(branchName)) {
       acrNiloRepository_name = "emaznilopcregistry01" 
     }
     return acrNiloRepository_name;
   }
 	
-def getContainerRegistryUrl(def branchName) {
+  def getContainerRegistryUrl(def branchName) {
     def acrNilorepository_url = "emaznilopcregistry01.azurecr.io"
-    if (branchName.startsWith('development') || branchName.startsWith('release') || branchName.startsWith('development-v') || branchName.startsWith('release-v')) {
+    if (isDevelopmentMode(branchName) || isHomologationMode(branchName)) {
       acrNilorepository_url = "nilocontainerregistry.azurecr.io"
-    } else if (branchName.startsWith('master') || branchName.startsWith('master-v')) {
+    } else if (isProductionMode(branchName)) {
       acrNilorepository_url = "emaznilopcregistry01.azurecr.io"
     }
     return acrNilorepository_url
   }	
 	
 	
-def getContainerRegistryCredentialFile(def branchName) {
+  def getContainerRegistryCredentialFile(def branchName) {
     def acrNilorepositoryCredential_file = "FILE_ACR_NILO_EMAZNILOPCREGISTRY01_CREDENTIAL"
-    if (branchName.startsWith('development') || branchName.startsWith('release') || branchName.startsWith('development-v') || branchName.startsWith('release-v')) {
+    if (isDevelopmentMode(branchName) || isHomologationMode(branchName)) {
       acrNilorepositoryCredential_file = "NILO-AZURE-DOCKER"
-    } else if (branchName.startsWith('master') || branchName.startsWith('master-v')) {
+    } else if (isProductionMode(branchName)) {
       acrNilorepositoryCredential_file = "FILE_ACR_NILO_EMAZNILOPCREGISTRY01_CREDENTIAL"
     }
     return acrNilorepositoryCredential_file
@@ -78,25 +96,25 @@ def getContainerRegistryCredentialFile(def branchName) {
 	
   def getApmEnv(def branchName) {
     def env
-    if (branchName.startsWith('development') || branchName.startsWith('development-v')) {
-	env = 'DEV'
-    } else if (branchName.startsWith('release') || branchName.startsWith('release-v')) {
-	env = 'UAT'
-    } else if (branchName.startsWith('master') || branchName.startsWith('master-v')) {
-	env = 'PRO'
+    if (isDevelopmentMode(branchName)) {
+	  env = 'DEV'
+    } else if (isHomologationMode(branchName)) {
+	  env = 'UAT'
+    } else if (isProductionMode(branchName)) {
+	  env = 'PRO'
     }
     return env
   }
 	
   def connectToArtifactory(def serverId, def artifactoryUrl, def username, def password) {
     steps.rtServer(
-                  id: serverId,
-                  url: artifactoryUrl,
-                  username: username,
-                  password: password,
-                  bypassProxy: true,
-                  timeout: 300
-                )
+      id: serverId,
+      url: artifactoryUrl,
+      username: username,
+      password: password,
+      bypassProxy: true,
+      timeout: 300
+    )
   }
 	
   def downloadJarFromArtifactory(def serverId, def jarUrl, def targetDir) {
