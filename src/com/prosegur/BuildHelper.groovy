@@ -124,7 +124,6 @@ def getContainerRegistryCredentialFile(def branchName) {
       unzip ./agent.zip
 
       cp -R ./perfino ./$targetDirName/src/main/
-      ls -al ./$targetDirName/src/main/perfino
      """
   }
 	
